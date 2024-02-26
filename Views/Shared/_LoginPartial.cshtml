@@ -1,0 +1,39 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<SocialMediaWisLam.Models.Profile> SignInManager
+@inject UserManager<SocialMediaWisLam.Models.Profile> UserManager
+
+<ul class="navbar-nav">
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+            <div class="w-10 rounded-full">
+                <img alt="Tailwind CSS Navbar component" src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+            </div>
+        </div>
+        <ul tabindex="0" class="z-20 menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
+            <li class="nav-item">
+                <a class="truncate w-52" asp-controller="Profiles" asp-action="Details" asp-route-id="@UserManager.GetUserId(User)">@UserManager.GetUserName(User)! ahsodifhojasodjfojiaosjdofjoasjiodjf</a>
+            </li>
+            <li class="nav-item">
+                <a id="manage" class="justify-between" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Setting</a>
+            </li>
+            <li class="nav-item">
+                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                    <button type="submit" class="btn btn-link text-dark">Click here to Logout</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    </li>
+}
+</ul>

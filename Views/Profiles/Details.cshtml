@@ -1,0 +1,104 @@
+﻿@model SocialMediaWisLam.Models.Profile
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+<main class="container mx-auto">
+    <div class="flex flex-col relative mb-4" style="height: 38rem;">
+        <img src=@Html.DisplayFor(model => model.CoverPictureUrl) alt="Alternate Text" class="object-cover w-full rounded-b-lg" style="height: 32rem;" />
+        <div class="flex justify-items-center absolute left-0 bottom-0">
+            <img src=@Html.DisplayFor(model => model.PictureUrl) alt="Alternate Text" class="object-cover h-48 w-48 rounded-full mx-8" />
+            <div class="flex flex-col justify-end ">
+                <div class="text-2xl font-semibold block mb-2.5">@Html.DisplayFor(model => model.FirstName) @Html.DisplayFor(model => model.LastName)</div>
+                <button class="btn mb-2">Add Friend</button>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="flex">
+        <button class="btn glass mx-8">Infomation</button>
+        <button class="btn glass">Post</button>
+    </div>
+
+    <div class="mx-4 my-4 px-4 py-4 rounded bg-base-200">
+        <div class="flex flex-col justify-items-start mb-4">
+            <div class="text-xl font-semibold">
+                @Html.DisplayNameFor(model => model.AboutMe)
+            </div>
+            <div class="flex justify-center">
+                <p>@Html.DisplayFor(model => model.AboutMe)</p>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="flex my-4">
+            <div class="mr-1.5">@Html.DisplayNameFor(model => model.Birthday): </div>
+            <p>@Html.DisplayFor(model => model.Birthday)</p>
+        </div>
+
+        <div class="flex my-4">
+            <div class="mr-1.5">@Html.DisplayNameFor(model => model.Gender): </div>
+            <p>@Html.DisplayFor(model => model.Gender)</p>
+        </div>
+
+    </div>
+</main>
+
+
+
+@* <h1>Details</h1>
+
+<div>
+    <h4>Profile</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Birthday)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Birthday)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.PictureUrl)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.PictureUrl)
+        </dd>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CoverPictureUrl)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.AboutMe)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.AboutMe)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Gender)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Gender)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div> *@
