@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMediaWisLam.Data;
 
@@ -11,9 +12,11 @@ using SocialMediaWisLam.Data;
 namespace SocialMediaWisLam.Migrations
 {
     [DbContext(typeof(SocialMediaWisLamContext))]
-    partial class SocialMediaWisLamContextModelSnapshot : ModelSnapshot
+    [Migration("20240306005031_InitialEmotionVer4")]
+    partial class InitialEmotionVer4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -396,21 +399,6 @@ namespace SocialMediaWisLam.Migrations
                     b.ToTable("Post");
                 });
 
-            modelBuilder.Entity("SocialMediaWisLam.Models.SavedPost", b =>
-                {
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserIdNotOwner")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("PostId", "UserIdNotOwner");
-
-                    b.HasIndex("UserIdNotOwner");
-
-                    b.ToTable("SavedPost");
-                });
-
             modelBuilder.Entity("SocialMediaWisLam.Models.Video", b =>
                 {
                     b.Property<int>("Id")
@@ -574,25 +562,6 @@ namespace SocialMediaWisLam.Migrations
                         .HasForeignKey("ProfileOwnerId");
 
                     b.Navigation("ProfileOwner");
-                });
-
-            modelBuilder.Entity("SocialMediaWisLam.Models.SavedPost", b =>
-                {
-                    b.HasOne("SocialMediaWisLam.Models.Post", "PostSaved")
-                        .WithMany()
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SocialMediaWisLam.Models.Profile", "ProfileNotOwner")
-                        .WithMany()
-                        .HasForeignKey("UserIdNotOwner")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PostSaved");
-
-                    b.Navigation("ProfileNotOwner");
                 });
 
             modelBuilder.Entity("SocialMediaWisLam.Models.Video", b =>

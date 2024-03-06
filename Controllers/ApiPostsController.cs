@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Linq;
 using System.Security.Claims;
@@ -39,19 +41,25 @@ namespace SocialMediaWisLam.Controllers
 
             public Profile ProfileOwner { get; set; }
 
-            public List<Video> Videos { get; set; }
+            public ICollection<Video> Videos { get; set; }
 
-            public List<Photo> Photos { get; set; }
+            public ICollection<Photo> Photos { get; set; }
 
-            public ViewModelPost(int id, string description, DateTime updatedDate, Profile profileOwner, List<Video> videos, List<Photo> photo) {
+            public int NumOfLike { get; set; }
+
+            public bool IsLike { get; set; }
+
+            public ViewModelPost(int id, string description, DateTime updatedDate, Profile profileOwner, ICollection<Video> videos, ICollection<Photo> photos, int numOfLike, bool isLike) {
                 Id = id;
                 Description = description;
                 UpdatedDate = updatedDate;
                 ProfileOwner = profileOwner;
-                Photos = photo;
+                Photos = photos;
                 Videos = videos;
+                NumOfLike = numOfLike;
+                IsLike = isLike;
             }
-            
+
         }
 
         // GET: api/ApiPosts
@@ -59,8 +67,7 @@ namespace SocialMediaWisLam.Controllers
         public async Task<ActionResult<IEnumerable<ViewModelPost>>> GetPost(int? pageNumber)
         {
             int pageSize = 3;
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "-1";
             var posts = from p in _context.Post
                         join pr in _context.Profile on p.ProfileOwner equals pr
                         select new {
@@ -84,7 +91,15 @@ namespace SocialMediaWisLam.Controllers
             posts = posts.OrderByDescending(p => p.Id);
 
             var postsVer = await posts.AsNoTracking().Skip(((pageNumber ?? 1) - 1) * pageSize).Take(pageSize).Select(item =>
-                    (new ViewModelPost(item.Id, item.Description, item.UpdatedDate, item.ProfileOwner, item.Videos, item.Photos))).ToListAsync();
+                    (new ViewModelPost(item.Id, 
+                    item.Description, 
+                    item.UpdatedDate, 
+                    item.ProfileOwner, 
+                    item.Videos, 
+                    item.Photos, 
+                    _context.Emotion.Where(item1 => item1.PostId == item.Id).Count(),
+                    _context.Emotion.Where(item1 => item1.UserId == userId && item.Id == item1.PostId).FirstOrDefault() != null)))
+                .ToListAsync();
 
             return postsVer;
         }
@@ -94,7 +109,6 @@ namespace SocialMediaWisLam.Controllers
         public async Task<ActionResult<Post>> GetPost(int id)
         {
             var post = await _context.Post.FindAsync(id);
-
 
 
             if (post == null)
@@ -338,6 +352,73 @@ namespace SocialMediaWisLam.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        public class FormEmotion {
+            public int PostId { get; set; }
+
+            public string UserId { get; set; }
+
+            public int Emoji { get; set; }
+        }
+
+
+        [HttpPost("Emotion")]
+        public async Task<ActionResult<Emotion>> PostEmotion([FromBody]FormEmotion emotionPara) {
+            var emotionExist = await _context.Emotion.Where(item => item.UserId == emotionPara.UserId && item.PostId == emotionPara.PostId).FirstOrDefaultAsync();
+            if (emotionExist == null)
+            {
+                var emotion = Activator.CreateInstance<Emotion>();
+                emotion.PostId = emotionPara.PostId;
+                emotion.PostOwner = await _context.Post.FindAsync(emotionPara.PostId);
+                emotion.UserId = emotionPara.UserId;
+                emotion.ProfileOwner = await _context.Profile.FindAsync(emotionPara.UserId);
+                emotion.Emoji = emotionPara.Emoji;
+                await _context.Emotion.AddAsync(emotion);
+                await _context.SaveChangesAsync();
+                return emotion;
+            }
+            else {
+                _context.Emotion.Remove(emotionExist);
+                await _context.SaveChangesAsync();
+            }
+
+            emotionExist.Emoji = -1;
+            return emotionExist;
+        }
+
+        public class FormSavedPost {
+            public int PostId { get; set; }
+
+            public string UserIdNotOwner { get; set; }
+
+            public FormSavedPost(int postId, string userIdNotOwner) {
+                PostId = postId;
+                UserIdNotOwner = userIdNotOwner;
+            }
+        }
+
+        [HttpPost("SavedPost")]
+        public async Task<ActionResult<SavedPost>> SavedPost([FromBody] FormSavedPost formSavedPost) {
+            var savePostExist = await _context.SavedPost
+                .Where(item => item.PostId ==  formSavedPost.PostId && item.UserIdNotOwner == formSavedPost.UserIdNotOwner).FirstOrDefaultAsync();
+            if (savePostExist == null)
+            {
+                var savedPost = Activator.CreateInstance<SavedPost>();
+                savedPost.PostId = formSavedPost.PostId;
+                savedPost.UserIdNotOwner = formSavedPost.UserIdNotOwner;
+                savedPost.ProfileNotOwner = await _context.Profile.FindAsync(savedPost.UserIdNotOwner);
+                savedPost.PostSaved = await _context.Post.FindAsync(savedPost.PostId);
+                await _context.AddAsync(savedPost);
+                await _context.SaveChangesAsync();
+                return savedPost;
+            }
+            else {
+                _context.SavedPost.Remove(savePostExist);
+                await _context.SaveChangesAsync();
+            }
+
+            return savePostExist;
         }
 
         private bool PostExists(int id)

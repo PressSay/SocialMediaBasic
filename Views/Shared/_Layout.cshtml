@@ -1,26 +1,36 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<SocialMediaWisLam.Models.Profile> SignInManager
+@inject UserManager<SocialMediaWisLam.Models.Profile> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SocialMediaWisLam</title>
+    <title>@ViewData["Title"] - StudentCTU</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SocialMediaWisLam.styles.css" asp-append-version="true" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
     <header>
         <div class="navbar bg-base-100 mb-3">
             <div class="navbar-start">
                 <div class="flex">
-                    <a class="btn btn-ghost text-lg hidden md:flex">WisLam</a>
-                    <div class="form-control mr-2 hidden md:block">
-                        <form asp-controller="Search" asp-action="Index" method="get">
-                            <input type="text" name="searchString" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
-                            <input type="submit" value="search" class="hidden" />
-                        </form>
-                    </div>
+                    <a href="/" class="btn btn-ghost text-lg hidden md:flex">StudentCTU</a>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <div class="form-control mr-2 hidden md:block">
+                            <form asp-controller="Search" asp-action="Index" method="get">
+                                <input type="text" name="searchString" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
+                                <input type="submit" value="search" class="hidden" />
+                            </form>
+                        </div>
+                    }
                 </div>
             </div>
             <div class="navbar-center">
@@ -38,22 +48,7 @@
                 </button>
             </div>
             <div class="navbar-end">
-                <div class="dropdown dropdown-end">
-                    <div id="btn-notification" tabindex="0" role="button" class="btn btn-ghost btn-circle ">
-                        <div class="indicator">
-                            <svg  xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                            <span id="indicator-notication" class="badge badge-xs badge-primary indicator-item"></span>
-                        </div>
-                    </div>
-                    <ul id="notification-post" tabindex="0" class="z-20 menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-                        <li class="flex flex-col items-center border rounded-lg">
-                            <div class="font-semibold">new Post From Abc</div>
-                            <button class="btn btn-circle btn-outline w-10 h-10">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
+                
                 <partial name="_LoginPartial" />
             </div>
         </div>
@@ -131,6 +126,7 @@
     </script>
 
     <script>
+        const avatar = document.getElementsByClassName("avatar-user");
         const btnSearchMoblie = document.getElementById("btnSearchMoblie");
         const searchMoblie = document.getElementById("searchMoblie");
         const cBothSide = document.getElementsByClassName("c-bolh-sides");
@@ -178,8 +174,14 @@
         });
 
 
-        console.log(cBothSide[0]);
-        console.log(cBothSide[1]);
+        fetch("/api/ApiProfiles")
+            .then((response) => response.json())
+            .then(profile => {
+                for (let item of avatar) {
+                    item.src = profile.pictureUrl;
+                }
+            });
+
 
     </script>
 

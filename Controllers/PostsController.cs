@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SocialMediaWisLam.Data;
 using SocialMediaWisLam.Models;
+using static SocialMediaWisLam.Controllers.ApiPostsController;
+using System.Security.Claims;
 
 
 
@@ -36,15 +38,24 @@ namespace SocialMediaWisLam.Controllers
             {
                 return NotFound();
             }
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "-1";
+            Post post = await _context.Post.FirstOrDefaultAsync(m => m.Id == id);
+            int countEmotion = await _context.Emotion.Where(item1 => item1.PostId == post.Id).CountAsync();
+            Emotion emotion = await _context.Emotion.Where(item1 => item1.UserId == userId && item1.PostId == post.Id).FirstOrDefaultAsync();
+            bool isLike = emotion != null;
 
-            var post = await _context.Post
-                .FirstOrDefaultAsync(m => m.Id == id);
+            post.Videos = await _context.Video.Where(item => item.PostOwner.Id == post.Id).ToListAsync();
+            post.Photos = await _context.Photo.Where(item => item.PostOwner.Id == post.Id).ToListAsync();
+            post.ProfileOwner = await _context.Profile.Where(item => item.Id == userId).FirstAsync();
+
+            var model = new ViewModelPost(post.Id, post.Description, post.UpdatedDate, post.ProfileOwner, post.Videos, post.Photos, countEmotion, isLike);
+
             if (post == null)
             {
                 return NotFound();
             }
 
-            return View(post);
+            return View(model);
         }
 
         // GET: Posts/Create

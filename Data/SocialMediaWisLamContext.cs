@@ -29,5 +29,9 @@ namespace SocialMediaWisLam.Data
 
         public DbSet<SocialMediaWisLam.Models.Messenger> Messenger { get; set; } = default!;
 
+        public DbSet<SocialMediaWisLam.Models.Emotion> Emotion { get; set; } = default!;
+
+        public DbSet<SocialMediaWisLam.Models.SavedPost> SavedPost { get; set; } = default!;
+
     }
 }
